@@ -256,16 +256,50 @@ vercel
 
 **Note:** May need adjustments for file uploads (consider cloud storage)
 
+### Supabase Configuration (Optional)
+
+Enable dynamic config and cloud storage:
+
+1) Install dep:
+```bash
+pip install supabase
+```
+
+2) Create a table for config overrides:
+```sql
+create table if not exists app_config (
+  key text primary key,
+  value jsonb
+);
+-- example values
+insert into app_config (key, value) values
+  ('max_parallel_loaders', '4'::jsonb)
+on conflict (key) do update set value = excluded.value;
+```
+
+3) (Optional) Create a public Storage bucket (e.g. `datasets`) and make it public, or rely on signed URLs.
+
+4) Set env vars:
+```bash
+export SUPABASE_URL=...            # Project URL
+export SUPABASE_SERVICE_ROLE_KEY=...  # Service role (server-side only)
+export SUPABASE_STORAGE_BUCKET=datasets
+```
+
+On startup, the app will:
+- Load `app_config` and overlay values onto `settings`
+- Upload exported datasets to the bucket and return a public/signed URL in the API response (`supabase_url`)
+
 ### Environment Variables
 
-No required environment variables, but you can customize:
+No required environment variables to run locally, but if you want Supabase integration:
 
 ```bash
-# Optional: Set upload/output directories
-UPLOAD_DIR=./uploads
-OUTPUT_DIR=./outputs
+SUPABASE_URL=your-project-url
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+SUPABASE_STORAGE_BUCKET=your-bucket-name   # optional, for dataset uploads
 
-# Optional: Adjust bot settings
+# Optional: Adjust bot settings (can also be set via Supabase app_config table)
 MAX_PARALLEL_LOADERS=4
 HTTP_TIMEOUT=30
 ```

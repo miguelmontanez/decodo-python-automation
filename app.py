@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from training_data_bot import TrainingDataBot
 from training_data_bot.models import TaskType, ExportFormat
+from training_data_bot.storage import upload_to_supabase
 
 app = FastAPI(title="Training Data Bot API", version="0.1.0")
 
@@ -388,12 +389,15 @@ async def process_documents(
             output_path = OUTPUT_DIR / output_filename
             
             await bot.export_dataset(dataset, output_path, format=export_format)
-            
+            # Optional: upload to Supabase Storage and include a URL
+            public_url = upload_to_supabase(output_path)
+
             return JSONResponse({
                 "status": "success",
                 "examples_count": len(dataset.examples),
                 "download_url": f"/api/download/{output_filename}",
-                "output_filename": output_filename
+                "output_filename": output_filename,
+                "supabase_url": public_url
             })
     
     except Exception as e:

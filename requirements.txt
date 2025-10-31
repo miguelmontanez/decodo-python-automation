@@ -11,4 +11,5 @@ httpx>=0.25.0
 
 # Optional but useful
 aiofiles>=23.2.1
+supabase>=2.4.0
 
