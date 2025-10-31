@@ -132,6 +132,192 @@ await bot.export_dataset(dataset, "./out/data.jsonl", format=ExportFormat.JSONL)
 - Add richer logging/telemetry and persistent storage if required
 - Extend loaders for more formats as needed
 
+## 🌐 Web Deployment
+
+The project includes a ready-to-deploy FastAPI web application with a beautiful UI!
+
+### Quick Start (Local Development)
+
+1. **Install dependencies:**
+```bash
+pip install -r requirements.txt
+```
+
+2. **Run the web server:**
+```bash
+python app.py
+# OR
+uvicorn app:app --reload --host 0.0.0.0 --port 8000
+```
+
+3. **Open in browser:**
+```
+http://localhost:8000
+```
+
+### Features
+
+- 📤 **Upload multiple documents** (PDF, TXT, DOCX, MD, HTML, JSON, CSV)
+- 🔗 **Process URLs** from the web
+- ✅ **Select task types** (Q&A, Classification, Summarization)
+- 📥 **Download generated datasets** (JSONL/JSON format)
+- 🎨 **Modern, responsive UI** with real-time progress
+
+### Deployment Options
+
+#### Option 1: Railway (Recommended - Easiest)
+
+1. **Install Railway CLI:**
+```bash
+npm i -g @railway/cli
+railway login
+```
+
+2. **Deploy:**
+```bash
+railway init
+railway up
+```
+
+Or use the Railway web dashboard:
+- Go to [railway.app](https://railway.app)
+- Create new project
+- Connect your GitHub repo
+- Railway auto-detects the `Procfile` and deploys!
+
+**Benefits:** Free tier available, auto-deploys on git push, SSL included
+
+#### Option 2: Render
+
+1. Go to [render.com](https://render.com)
+2. Create new Web Service
+3. Connect your GitHub repo
+4. Settings:
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `uvicorn app:app --host 0.0.0.0 --port $PORT`
+   - **Environment:** Python 3
+
+**Benefits:** Free tier, easy setup, auto-deploys
+
+#### Option 3: Heroku
+
+1. **Install Heroku CLI:**
+```bash
+heroku login
+heroku create your-app-name
+```
+
+2. **Deploy:**
+```bash
+git push heroku main
+```
+
+**Note:** Requires Heroku account (free tier available)
+
+#### Option 4: Docker (Any Platform)
+
+1. **Build and run:**
+```bash
+docker-compose up --build
+```
+
+Or use Docker directly:
+```bash
+docker build -t training-data-bot .
+docker run -p 8000:8000 training-data-bot
+```
+
+**Deploy to:**
+- AWS ECS/Fargate
+- Google Cloud Run
+- Azure Container Instances
+- DigitalOcean App Platform
+- Any Docker host
+
+#### Option 5: Vercel (Serverless)
+
+1. Install Vercel CLI:
+```bash
+npm i -g vercel
+```
+
+2. Create `vercel.json`:
+```json
+{
+  "builds": [{"src": "app.py", "use": "@vercel/python"}],
+  "routes": [{"src": "/(.*)", "dest": "app.py"}]
+}
+```
+
+3. Deploy:
+```bash
+vercel
+```
+
+**Note:** May need adjustments for file uploads (consider cloud storage)
+
+### Environment Variables
+
+No required environment variables, but you can customize:
+
+```bash
+# Optional: Set upload/output directories
+UPLOAD_DIR=./uploads
+OUTPUT_DIR=./outputs
+
+# Optional: Adjust bot settings
+MAX_PARALLEL_LOADERS=4
+HTTP_TIMEOUT=30
+```
+
+### API Endpoints
+
+The web app exposes these REST endpoints:
+
+- `GET /` - Web UI
+- `POST /api/process` - Process documents (multipart/form-data)
+  - `files`: Uploaded files
+  - `urls`: JSON array of URLs
+  - `task_types`: JSON array of task types
+  - `format`: "jsonl" or "json"
+- `GET /api/download/{filename}` - Download generated dataset
+- `GET /api/health` - Health check
+
+### Production Considerations
+
+1. **File Storage:** Consider using cloud storage (S3, GCS) instead of local filesystem for `uploads/` and `outputs/`
+2. **Rate Limiting:** Add rate limiting for production use
+3. **Authentication:** Add user auth if needed
+4. **Database:** Add persistent storage for job tracking
+5. **Background Jobs:** Use Celery/Redis for long-running processing
+6. **Monitoring:** Add logging, metrics, error tracking
+
+### Example Production Setup
+
+```python
+# Add to app.py for cloud storage
+from google.cloud import storage  # or boto3 for S3
+
+# Replace local file saving with cloud upload
+# Replace file serving with cloud download URLs
+```
+
+### Troubleshooting
+
+**Port already in use:**
+```bash
+uvicorn app:app --port 8001
+```
+
+**Dependencies missing:**
+```bash
+pip install -r requirements.txt
+```
+
+**File upload errors:**
+- Check `uploads/` directory permissions
+- Ensure sufficient disk space
+
 ### License
 
 MIT (or your chosen license)
