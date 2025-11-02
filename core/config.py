@@ -1,7 +1,7 @@
 from dataclasses import dataclass, asdict
 from typing import Any, Dict
 
-from .config_supabase import load_remote_config
+from config_supabase import load_remote_config
 
 
 @dataclass

@@ -3,10 +3,10 @@ import csv
 import json
 from pathlib import Path
 
-from .base_loader import BaseLoader
-from ..core.config import settings
-from ..core.exceptions import DocumentLoadError
-from ..models import Document, DocumentType
+from base_loader import BaseLoader
+from core.config import settings
+from core.exceptions import DocumentLoadError
+from models import Document, DocumentType
 
 
 class DocumentLoader(BaseLoader):

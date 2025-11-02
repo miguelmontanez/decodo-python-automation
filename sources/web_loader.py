@@ -2,10 +2,10 @@ import asyncio
 
 import httpx
 
-from .base_loader import BaseLoader
-from ..core.config import settings
-from ..core.exceptions import DocumentLoadError
-from ..models import DocumentType
+from base_loader import BaseLoader
+from core.config import settings
+from core.exceptions import DocumentLoadError
+from models import DocumentType
 
 
 class WebLoader(BaseLoader):

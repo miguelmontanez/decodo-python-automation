@@ -3,10 +3,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from uuid import UUID
 
-from .core.config import settings
-from .core.exceptions import ConfigurationError
-from .core.logging import LogContext, get_logger
-from .models import (
+from core.config import settings
+from core.exceptions import ConfigurationError
+from core.logging import LogContext, get_logger
+from models import (
     Dataset,
     Document,
     DocumentType,
@@ -16,13 +16,13 @@ from .models import (
     TextChunk,
     TrainingExample,
 )
-from .sources.unified import UnifiedLoader
-from .decodo import DecodoClient
-from .ai import AIClient
-from .tasks import TaskManager, QAGenerator, ClassificationGenerator, SummarizationGenerator
-from .preprocessing import TextPreprocessor
-from .evaluation import QualityEvaluator
-from .storage import DatasetExporter, DatabaseManager
+from sources.unified import UnifiedLoader
+from decodo import DecodoClient
+from ai import AIClient
+from tasks import TaskManager, QAGenerator, ClassificationGenerator, SummarizationGenerator
+from preprocessing import TextPreprocessor
+from evaluation import QualityEvaluator
+from storage import DatasetExporter, DatabaseManager
 
 
 class TrainingDataBot:

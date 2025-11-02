@@ -1,6 +1,6 @@
 from .task_base import TaskManager, TaskGenerator
 
-from ..models import TaskTemplate, TaskType, TrainingExample
+from models import TaskTemplate, TaskType, TrainingExample
 
 
 class QAGenerator(TaskGenerator):

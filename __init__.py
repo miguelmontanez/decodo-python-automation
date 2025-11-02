@@ -10,18 +10,18 @@ __email__ = "team@company.com"
 __description__ = "Enterprise-grade training data curation bot for LLM fine-tuning"
 
 # Core imports for easy access
-from .core.config import settings
-from .core.logging import get_logger
-from .core.exceptions import TrainingDataBotError
+from core.config import settings
+from core.logging import get_logger
+from core.exceptions import TrainingDataBotError
 
 # Main bot class
 from .bot import TrainingDataBot
 
 # Sources
-from .sources.unified import UnifiedLoader
-from .sources.pdf_loader import PDFLoader
-from .sources.web_loader import WebLoader
-from .sources.document_loader import DocumentLoader
+from sources.unified import UnifiedLoader
+from sources.pdf_loader import PDFLoader
+from sources.web_loader import WebLoader
+from sources.document_loader import DocumentLoader
 
 # Tasks
 from .tasks import (
@@ -33,10 +33,10 @@ from .tasks import (
 )
 
 # Services
-from .decodo import DecodoClient
-from .preprocessing import TextPreprocessor
-from .evaluation import QualityEvaluator
-from .storage import DatasetExporter
+from decodo import DecodoClient
+from preprocessing import TextPreprocessor
+from evaluation import QualityEvaluator
+from storage import DatasetExporter
 
 __all__ = [
     # Core

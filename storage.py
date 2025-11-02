@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from typing import Optional
 
-from .models import Dataset, ExportFormat
+from models import Dataset, ExportFormat
 
 
 class DatasetExporter:

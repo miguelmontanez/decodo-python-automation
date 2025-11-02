@@ -1,9 +1,9 @@
 import asyncio
 from pathlib import Path
 
-from .base_loader import BaseLoader
-from ..core.exceptions import DocumentLoadError
-from ..models import DocumentType
+from base_loader import BaseLoader
+from core.exceptions import DocumentLoadError
+from models import DocumentType
 
 
 class PDFLoader(BaseLoader):

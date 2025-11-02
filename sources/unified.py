@@ -2,14 +2,14 @@ import asyncio
 from pathlib import Path
 from typing import List
 
-from .base_loader import BaseLoader
-from .document_loader import DocumentLoader
-from .pdf_loader import PDFLoader
-from .web_loader import WebLoader
-from ..core.config import settings
-from ..core.exceptions import DocumentLoadError
-from ..core.logging import LogContext, get_logger
-from ..models import Document, DocumentType
+from base_loader import BaseLoader
+from document_loader import DocumentLoader
+from pdf_loader import PDFLoader
+from web_loader import WebLoader
+from core.config import settings
+from core.exceptions import DocumentLoadError
+from core.logging import LogContext, get_logger
+from models import Document, DocumentType
 
 
 class UnifiedLoader(BaseLoader):

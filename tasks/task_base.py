@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Dict
 
-from ..models import TaskTemplate, TaskType, TrainingExample
+from models import TaskTemplate, TaskType, TrainingExample
 
 
 class TaskGenerator:

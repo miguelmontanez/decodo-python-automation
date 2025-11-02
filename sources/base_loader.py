@@ -3,9 +3,9 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import List
 
-from ..core.config import settings
-from ..core.logging import get_logger
-from ..models import Document, DocumentType
+from core.config import settings
+from core.logging import get_logger
+from models import Document, DocumentType
 
 
 class BaseLoader(ABC):
