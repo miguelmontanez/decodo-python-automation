@@ -11,9 +11,9 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-from training_data_bot import TrainingDataBot
-from training_data_bot.models import TaskType, ExportFormat
-from training_data_bot.storage import upload_to_supabase
+from bot import TrainingDataBot
+from models import TaskType, ExportFormat
+from storage import upload_to_supabase
 
 app = FastAPI(title="Training Data Bot API", version="0.1.0")
 
