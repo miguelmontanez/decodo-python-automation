@@ -1,359 +1,527 @@
-## Training Data Curation Bot
+# Decodo Python Automation
 
-Enterprise-grade training data curation bot for LLM fine-tuning using Decodo + Python automation.
+Enterprise-grade training data curation and automation platform for LLM fine-tuning using Decodo + Python automation.
 
-### What is this?
+## Overview
 
-This package provides a high-level, batteries-included workflow to:
-- Load documents from files or the web (PDF, DOCX, TXT, MD, HTML, JSON, CSV, URLs)
-- Chunk and preprocess text
-- Generate task-specific training examples (Q&A, classification, summarization)
-- Evaluate quality
-- Export datasets (JSONL/JSON)
+A comprehensive Python automation framework that provides a production-ready workflow for intelligent data processing and training dataset generation. Designed with async-first architecture, modular components, and seamless integration with Decodo.
 
-It exposes a clean package “front desk” via `__init__.py` so users can import the most useful parts from one place.
+### Key Capabilities
 
-### Quickstart
+- **Multi-Format Document Loading** - PDF, DOCX, TXT, MD, HTML, JSON, CSV, and web URLs
+- **Intelligent Text Processing** - Chunking, preprocessing, and text analysis
+- **Automated Task Generation** - Q&A pairs, classification, summarization, NER, red-teaming
+- **Quality Assessment** - Automated quality evaluation and filtering
+- **Dataset Export** - Multiple export formats (JSONL, JSON) for training pipelines
+- **Web Interface** - Interactive FastAPI application with modern UI
+- **Cloud Integration** - Supabase support for configuration and storage
 
-```python
-import asyncio
-from training_data_bot import TrainingDataBot, TaskType
+## Quick Start
 
+### Installation
 
-async def main():
-    async with TrainingDataBot() as bot:
-        docs = await bot.load_documents(["/path/to/my.pdf", "https://example.com"])
-        dataset = await bot.process_documents(
-            documents=docs,
-            task_types=[TaskType.QA_GENERATION, TaskType.SUMMARIZATION],
-        )
-        await bot.export_dataset(dataset, "./output/dataset.jsonl")
-
-asyncio.run(main())
-```
-
-### Package entry points (front desk)
-
-From the package root you can import the most common classes:
-
-```python
-from training_data_bot import (
-    TrainingDataBot,
-    settings, get_logger, TrainingDataBotError,
-    PDFLoader, WebLoader, DocumentLoader, UnifiedLoader,
-    QAGenerator, ClassificationGenerator, SummarizationGenerator, TaskManager, TaskTemplate,
-    DecodoClient, TextPreprocessor, QualityEvaluator, DatasetExporter,
-)
-```
-
-### Architecture overview
-
-- Core
-  - `core/config.py`: Simple `settings` for runtime configuration
-  - `core/logging.py`: `get_logger` and `LogContext`
-  - `core/exceptions.py`: Domain exceptions
-- Models
-  - `models.py`: Entities (`Document`, `TextChunk`, `TrainingExample`, `Dataset`, `QualityReport`) and enums (`DocumentType`, `TaskType`, `ExportFormat`)
-- Sources
-  - `sources/base_loader.py`: Common loader base
-  - `sources/document_loader.py`: TXT/MD/HTML/JSON/CSV/DOCX
-  - `sources/pdf_loader.py`: PDF via PyMuPDF (optional dependency)
-  - `sources/web_loader.py`: URLs via httpx (+ BeautifulSoup if installed)
-  - `sources/unified.py`: Auto-detects and dispatches to the right loader; supports directories and parallel loading
-- Tasks
-  - `tasks/`: `TaskManager` plus simple generators (`QAGenerator`, `ClassificationGenerator`, `SummarizationGenerator`)
-- Pipeline services
-  - `preprocessing.py`: `TextPreprocessor` (simple chunker)
-  - `evaluation.py`: `QualityEvaluator` (naive scoring)
-  - `storage.py`: `DatasetExporter` (JSONL/JSON) and `DatabaseManager` stub
-  - `ai.py`: `AIClient` stub
-  - `decodo.py`: `DecodoClient` stub
-- Orchestrator
-  - `bot.py`: `TrainingDataBot` wires everything together with async APIs
-
-### Feature highlights
-
-- Unified loading for many formats and URLs (auto-detection)
-- Async pipeline; parallelized document loading
-- Pluggable tasks and simple default generators
-- Minimal evaluator and exporter included out of the box
-
-### Installation notes (optional dependencies)
-
-Some capabilities require extra packages:
-- PDF loading: `pip install PyMuPDF`
-- DOCX loading: `pip install python-docx`
-- HTML parsing: `pip install beautifulsoup4`
-- Web fetching: `pip install httpx`
-
-Install everything:
-
-```bash
-pip install PyMuPDF python-docx beautifulsoup4 httpx
-```
-
-### API snippets
-
-- Load many documents from a directory:
-
-```python
-docs = await bot.loader.load_directory("./my_corpus")
-```
-
-- Process with a specific task selection:
-
-```python
-from training_data_bot.models import TaskType
-
-dataset = await bot.process_documents(
-    documents=docs,
-    task_types=[TaskType.QA_GENERATION, TaskType.CLASSIFICATION],
-)
-```
-
-- Export to JSONL:
-
-```python
-from training_data_bot.models import ExportFormat
-
-await bot.export_dataset(dataset, "./out/data.jsonl", format=ExportFormat.JSONL)
-```
-
-### Design principles
-
-- Clear, minimal public API via package root
-- Separation of concerns: loaders, preprocessing, tasks, evaluation, export
-- Extensible base classes; reasonable defaults
-- Async-first for scalability
-
-### Limitations and next steps
-
-- Generators and evaluator are heuristic stubs; plug in real AI models and metrics for production
-- Add richer logging/telemetry and persistent storage if required
-- Extend loaders for more formats as needed
-
-## 🌐 Web Deployment
-
-The project includes a ready-to-deploy FastAPI web application with a beautiful UI!
-
-### Quick Start (Local Development)
-
-1. **Install dependencies:**
 ```bash
 pip install -r requirements.txt
 ```
 
-2. **Run the web server:**
+### Basic Usage
+
+```python
+import asyncio
+from bot import TrainingDataBot
+from models import TaskType
+
+async def main():
+    bot = TrainingDataBot()
+    
+    # Load documents from files and URLs
+    docs = await bot.load_documents([
+        "/path/to/document.pdf",
+        "/path/to/corpus/",
+        "https://example.com/article"
+    ])
+    
+    # Process and generate training data
+    dataset = await bot.process_documents(
+        documents=docs,
+        task_types=[TaskType.QA_GENERATION, TaskType.SUMMARIZATION]
+    )
+    
+    # Export dataset
+    await bot.export_dataset(dataset, "./output/dataset.jsonl")
+
+asyncio.run(main())
+```
+
+### Web Interface (Interactive)
+
+Start the FastAPI web application for an interactive experience:
+
 ```bash
 python app.py
-# OR
+# Visit http://localhost:8000
+```
+
+Features:
+- Upload multiple documents (drag & drop)
+- Input URLs for web content
+- Select task types to generate
+- Download results in JSONL or JSON format
+- Real-time processing status
+
+## Installation & Setup
+
+### Core Dependencies
+
+All core dependencies are in `requirements.txt`:
+
+```
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+aiofiles>=23.2.1
+supabase>=2.4.0
+```
+
+### Optional Dependencies
+
+Install additional packages for enhanced functionality:
+
+```bash
+# PDF support
+pip install PyMuPDF
+
+# DOCX support
+pip install python-docx
+
+# HTML parsing
+pip install beautifulsoup4
+
+# Web fetching
+pip install httpx
+
+# Install all optional dependencies
+pip install PyMuPDF python-docx beautifulsoup4 httpx
+```
+
+## Project Architecture
+
+### Directory Structure
+
+```
+.
+├── core/                      # Core utilities
+│   ├── config.py             # Settings management
+│   ├── logging.py            # Logging setup
+│   ├── config_supabase.py    # Supabase config
+│   └── exceptions.py         # Custom exceptions
+├── sources/                  # Document loading
+│   ├── base_loader.py        # Base loader interface
+│   ├── document_loader.py    # File loader (TXT/MD/HTML/JSON/CSV/DOCX)
+│   ├── pdf_loader.py         # PDF loader (PyMuPDF)
+│   ├── web_loader.py         # URL loader
+│   └── unified.py            # Auto-detection & unified interface
+├── tasks/                    # Task generation
+│   ├── task_base.py          # Base task interface
+│   └── __init__.py           # Task generators
+├── models.py                 # Data models & enums
+├── bot.py                    # Main orchestrator
+├── preprocessing.py          # Text processing
+├── evaluation.py             # Quality evaluation
+├── storage.py                # Export & persistence
+├── ai.py                     # AI client interface
+├── decodo.py                 # Decodo integration
+├── app.py                    # FastAPI web server
+├── __init__.py               # Package exports
+└── requirements.txt          # Dependencies
+```
+
+### Core Modules
+
+**Core Configuration & Utilities**
+- `core/config.py` - Runtime settings and configuration
+- `core/logging.py` - Structured logging with context
+- `core/exceptions.py` - Domain-specific exceptions
+- `core/config_supabase.py` - Supabase integration
+
+**Data Models**
+- `models.py` - All domain entities and enums
+  - `Document` - Loaded document representation
+  - `TextChunk` - Text segments for processing
+  - `TrainingExample` - Generated training example
+  - `Dataset` - Collection of training examples
+  - `TaskTemplate` - Task definition template
+  - `DocumentType`, `TaskType`, `ExportFormat` - Enums
+
+**Document Loading (sources/)**
+- `base_loader.py` - Abstract loader interface
+- `document_loader.py` - File-based documents
+- `pdf_loader.py` - PDF via PyMuPDF
+- `web_loader.py` - Web URLs via httpx & BeautifulSoup
+- `unified.py` - Auto-detection and unified API
+
+**Task Management (tasks/)**
+- Task generators for common ML tasks
+- `QAGenerator` - Generate question-answer pairs
+- `ClassificationGenerator` - Classification examples
+- `SummarizationGenerator` - Summarization tasks
+- `TaskManager` - Orchestrate and manage tasks
+
+**Pipeline Services**
+- `preprocessing.py` - Text chunking and preprocessing
+- `evaluation.py` - Quality assessment and scoring
+- `storage.py` - Dataset export (JSONL/JSON) and database management
+- `ai.py` - AI/LLM client interface (stub)
+- `decodo.py` - Decodo service client
+
+**Main Orchestrator**
+- `bot.py` - `TrainingDataBot` class that wires everything together with async APIs
+
+**Web Application**
+- `app.py` - FastAPI server with REST API and interactive UI
+
+## API Usage
+
+### Main Entry Point
+
+The `TrainingDataBot` class is the primary interface:
+
+```python
+from bot import TrainingDataBot
+from models import TaskType, ExportFormat
+
+bot = TrainingDataBot()
+```
+
+### Document Loading
+
+```python
+# Load from multiple sources (files, directories, URLs)
+docs = await bot.load_documents([
+    "./documents/report.pdf",
+    "./corpus/",
+    "https://example.com/article"
+])
+
+# Load from directory
+docs = await bot.loader.load_directory("./corpus")
+
+# Load single source
+doc = await bot.loader.load_single("./document.pdf")
+```
+
+### Processing Documents
+
+```python
+# Process with specific task types
+dataset = await bot.process_documents(
+    documents=docs,
+    task_types=[
+        TaskType.QA_GENERATION,
+        TaskType.CLASSIFICATION,
+        TaskType.SUMMARIZATION
+    ]
+)
+
+# Process all documents
+dataset = await bot.process_all_documents()
+```
+
+### Quality Evaluation
+
+```python
+# Evaluate dataset quality
+report = await bot.evaluate_dataset(dataset)
+
+# Get quality scores
+print(f"Quality: {report.scores}")
+print(f"Summary: {report.summary}")
+```
+
+### Dataset Export
+
+```python
+# Export to JSONL (line-delimited JSON)
+await bot.export_dataset(
+    dataset,
+    "./output/training_data.jsonl",
+    format=ExportFormat.JSONL
+)
+
+# Export to JSON
+await bot.export_dataset(
+    dataset,
+    "./output/training_data.json",
+    format=ExportFormat.JSON
+)
+```
+
+## Web Application API
+
+### REST Endpoints
+
+**Process Documents**
+```bash
+POST /api/process
+Content-Type: multipart/form-data
+
+Files: [document1.pdf, document2.txt, ...]
+URLs: ["https://example.com"]
+task_types: ["qa_generation", "summarization"]
+format: "jsonl"
+```
+
+**Download Dataset**
+```bash
+GET /api/download/{filename}
+```
+
+**Health Check**
+```bash
+GET /api/health
+```
+
+## Deployment
+
+### Local Development
+
+```bash
+python app.py
+# Or with auto-reload
 uvicorn app:app --reload --host 0.0.0.0 --port 8000
 ```
 
-3. **Open in browser:**
+### Docker
+
+```bash
+# Using Docker Compose
+docker-compose up
+
+# Or Docker directly
+docker build -t decodo-python-automation .
+docker run -p 8000:8000 decodo-python-automation
 ```
-http://localhost:8000
-```
 
-### Features
+### Railway (Recommended)
 
-- 📤 **Upload multiple documents** (PDF, TXT, DOCX, MD, HTML, JSON, CSV)
-- 🔗 **Process URLs** from the web
-- ✅ **Select task types** (Q&A, Classification, Summarization)
-- 📥 **Download generated datasets** (JSONL/JSON format)
-- 🎨 **Modern, responsive UI** with real-time progress
+Simple deployment to Railway:
 
-### Deployment Options
-
-#### Option 1: Railway (Recommended - Easiest)
-
-1. **Install Railway CLI:**
 ```bash
 npm i -g @railway/cli
 railway login
-```
-
-2. **Deploy:**
-```bash
-railway init
 railway up
 ```
 
-Or use the Railway web dashboard:
-- Go to [railway.app](https://railway.app)
-- Create new project
-- Connect your GitHub repo
-- Railway auto-detects the `Procfile` and deploys!
+Or via Railway web dashboard at [railway.app](https://railway.app)
 
-**Benefits:** Free tier available, auto-deploys on git push, SSL included
+### Heroku
 
-#### Option 2: Render
-
-1. Go to [render.com](https://render.com)
-2. Create new Web Service
-3. Connect your GitHub repo
-4. Settings:
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `uvicorn app:app --host 0.0.0.0 --port $PORT`
-   - **Environment:** Python 3
-
-**Benefits:** Free tier, easy setup, auto-deploys
-
-#### Option 3: Heroku
-
-1. **Install Heroku CLI:**
 ```bash
-heroku login
 heroku create your-app-name
-```
-
-2. **Deploy:**
-```bash
 git push heroku main
 ```
 
-**Note:** Requires Heroku account (free tier available)
+### Render
 
-#### Option 4: Docker (Any Platform)
+1. Go to [render.com](https://render.com)
+2. Create Web Service
+3. Connect GitHub repo
+4. Settings:
+   - Build: `pip install -r requirements.txt`
+   - Start: `uvicorn app:app --host 0.0.0.0 --port $PORT`
 
-1. **Build and run:**
+### Cloud Run (Google Cloud)
+
 ```bash
-docker-compose up --build
+gcloud run deploy decodo-python-automation \
+  --source . \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated
 ```
 
-Or use Docker directly:
+## Configuration
+
+### Environment Variables
+
+**Optional - Supabase Integration:**
 ```bash
-docker build -t training-data-bot .
-docker run -p 8000:8000 training-data-bot
+SUPABASE_URL=your-project-url
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+SUPABASE_STORAGE_BUCKET=datasets
 ```
 
-**Deploy to:**
-- AWS ECS/Fargate
-- Google Cloud Run
-- Azure Container Instances
-- DigitalOcean App Platform
-- Any Docker host
-
-#### Option 5: Vercel (Serverless)
-
-1. Install Vercel CLI:
+**Optional - Processing Settings:**
 ```bash
-npm i -g vercel
+MAX_PARALLEL_LOADERS=4
+HTTP_TIMEOUT=30
+CHUNK_SIZE=512
+CHUNK_OVERLAP=100
 ```
 
-2. Create `vercel.json`:
-```json
-{
-  "builds": [{"src": "app.py", "use": "@vercel/python"}],
-  "routes": [{"src": "/(.*)", "dest": "app.py"}]
-}
-```
+### Supabase Setup
 
-3. Deploy:
-```bash
-vercel
-```
+Enable cloud configuration and storage:
 
-**Note:** May need adjustments for file uploads (consider cloud storage)
-
-### Supabase Configuration (Optional)
-
-Enable dynamic config and cloud storage:
-
-1) Install dep:
-```bash
-pip install supabase
-```
-
-2) Create a table for config overrides:
+1. Create config table:
 ```sql
 create table if not exists app_config (
   key text primary key,
   value jsonb
 );
--- example values
+
 insert into app_config (key, value) values
-  ('max_parallel_loaders', '4'::jsonb)
-on conflict (key) do update set value = excluded.value;
+  ('max_parallel_loaders', '4'::jsonb),
+  ('http_timeout', '30'::jsonb);
 ```
 
-3) (Optional) Create a public Storage bucket (e.g. `datasets`) and make it public, or rely on signed URLs.
-
-4) Set env vars:
-```bash
-export SUPABASE_URL=...            # Project URL
-export SUPABASE_SERVICE_ROLE_KEY=...  # Service role (server-side only)
-export SUPABASE_STORAGE_BUCKET=datasets
+2. Create storage bucket (optional):
+```sql
+create bucket datasets;
 ```
 
-On startup, the app will:
-- Load `app_config` and overlay values onto `settings`
-- Upload exported datasets to the bucket and return a public/signed URL in the API response (`supabase_url`)
+3. Set environment variables (see above)
 
-### Environment Variables
+## Features & Capabilities
 
-No required environment variables to run locally, but if you want Supabase integration:
+✨ **Multi-Format Support**
+- PDF, DOCX, TXT, Markdown, HTML, JSON, CSV
+- Web URLs with automatic content extraction
+- Directory scanning with parallel loading
 
-```bash
-SUPABASE_URL=your-project-url
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-SUPABASE_STORAGE_BUCKET=your-bucket-name   # optional, for dataset uploads
+⚡ **Async-First Architecture**
+- Fully asynchronous pipeline
+- Non-blocking I/O operations
+- Parallel document processing
 
-# Optional: Adjust bot settings (can also be set via Supabase app_config table)
-MAX_PARALLEL_LOADERS=4
-HTTP_TIMEOUT=30
-```
+🔌 **Modular & Extensible**
+- Base classes for custom loaders
+- Pluggable task generators
+- Custom evaluators and exporters
 
-### API Endpoints
+🎯 **Task Generation**
+- Question-Answer generation
+- Text classification
+- Summarization
+- Named entity recognition (NER)
+- Red-teaming
+- Instruction-response pairs
 
-The web app exposes these REST endpoints:
+📊 **Quality Evaluation**
+- Automated quality scoring
+- Filtering and deduplication
+- Performance metrics
 
-- `GET /` - Web UI
-- `POST /api/process` - Process documents (multipart/form-data)
-  - `files`: Uploaded files
-  - `urls`: JSON array of URLs
-  - `task_types`: JSON array of task types
-  - `format`: "jsonl" or "json"
-- `GET /api/download/{filename}` - Download generated dataset
-- `GET /api/health` - Health check
+💾 **Multiple Export Formats**
+- JSONL (streaming-friendly)
+- JSON (nested structure)
+- Database integration
 
-### Production Considerations
+🌐 **Web Interface**
+- Modern, responsive UI
+- Real-time progress tracking
+- Drag-and-drop file upload
+- URL input support
 
-1. **File Storage:** Consider using cloud storage (S3, GCS) instead of local filesystem for `uploads/` and `outputs/`
-2. **Rate Limiting:** Add rate limiting for production use
-3. **Authentication:** Add user auth if needed
-4. **Database:** Add persistent storage for job tracking
-5. **Background Jobs:** Use Celery/Redis for long-running processing
-6. **Monitoring:** Add logging, metrics, error tracking
+## Design Principles
 
-### Example Production Setup
+- **Clean Public API** - Easy imports from package root
+- **Separation of Concerns** - Each module has clear responsibility
+- **Extensibility** - Base classes for custom implementations
+- **Async-First** - Non-blocking operations throughout
+- **Type Safety** - Full type hints for IDE support
+- **Production-Ready** - Error handling and logging
 
+## Production Considerations
+
+### File Storage
+For production, use cloud storage instead of local filesystem:
+- AWS S3
+- Google Cloud Storage
+- Azure Blob Storage
+
+### Rate Limiting
+Add rate limiting for public deployments:
 ```python
-# Add to app.py for cloud storage
-from google.cloud import storage  # or boto3 for S3
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 
-# Replace local file saving with cloud upload
-# Replace file serving with cloud download URLs
+limiter = Limiter(key_func=get_remote_address)
 ```
 
-### Troubleshooting
+### Authentication
+Implement user authentication if needed:
+```python
+from fastapi.security import HTTPBearer
+```
 
-**Port already in use:**
+### Monitoring
+Set up logging and error tracking:
+- Structured logging with context
+- Error reporting (Sentry, etc.)
+- Performance metrics
+
+### Background Jobs
+For long-running tasks, use:
+- Celery with Redis/RabbitMQ
+- Task queues for scalability
+
+## Troubleshooting
+
+**Port already in use**
 ```bash
 uvicorn app:app --port 8001
 ```
 
-**Dependencies missing:**
+**Module import errors**
 ```bash
 pip install -r requirements.txt
 ```
 
-**File upload errors:**
-- Check `uploads/` directory permissions
-- Ensure sufficient disk space
+**PDF loading fails**
+```bash
+pip install PyMuPDF
+```
 
-### License
+**Web requests timeout**
+```bash
+pip install httpx
+```
 
-MIT (or your chosen license)
+## Development
 
+### Running locally
+```bash
+python app.py
+```
 
+### Testing
+```bash
+python evaluation.py
+```
+
+### Adding new loaders
+1. Extend `sources/base_loader.py`
+2. Implement `load()` method
+3. Register in `sources/unified.py`
+
+### Adding new task types
+1. Create generator in `tasks/`
+2. Register in `TaskManager`
+3. Update `TaskType` enum in `models.py`
+
+## License
+
+See LICENSE file for details.
+
+## Support
+
+For questions, issues, or contributions:
+1. Check existing documentation
+2. Review code examples
+3. Contact the development team
+
+---
+
+**Version:** 0.1.0  
+**Last Updated:** January 2026
